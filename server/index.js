@@ -1,15 +1,19 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const config = require('./config/key');
 const { auth } = require('./middleware/auth');
 const { User } = require('./models/User');
+const cors = require('cors');
+
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors('https://5000-teal-fox-mayilo51.ws-us13.gitpod.io'))
+
 
 const mongoose = require('mongoose')
 
@@ -23,7 +27,14 @@ app.get('/', (req, res) => {
   res.send('Hello World! test')
 })
 
-app.post('api/users/register', (req, res) =>{
+app.get('/api/hello', (req, res) => {
+  return res.status(200).json({
+    success : true
+})
+})
+
+
+app.post('/api/users/register', (req, res) =>{
   const user = new User(req.body)
 
   user.save((err, userInfo) => {
@@ -34,7 +45,7 @@ app.post('api/users/register', (req, res) =>{
   })
 })
 
-app.post('api/users/login', (req, res) =>{
+app.post('/api/users/login', (req, res) =>{
   User.findOne({ email : req.body.email }, (err, user) => {
     if (!user) {
       return res.json({
@@ -48,17 +59,19 @@ app.post('api/users/login', (req, res) =>{
         return res.json({ loginSuccess : false, message : "비밀번호가 틀렸습니다."})
          
       user.generateToken((err, user) => {
-        if (err) return res.status(400).send(err)
+        if (err) return res.status(400).send(err);
 
         res.cookie("x_auth", user.token)
         .status(200)
         .json({ loginSuccess : true, userId : user._id})
+
+        console.log('user.token : ', user.token)
       })
     })
   })
 })
 
-app.get('api/users/auth', auth, (req, res) => {
+app.get('/api/users/auth', auth, (req, res) => {
   res.status(200).json({
     _id : req.user._id,
     isAdmin : req.user.role === 0 ? false : true,
@@ -83,5 +96,6 @@ app.get('/api/users/logout', auth, (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
 
 
