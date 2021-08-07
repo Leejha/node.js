@@ -12,7 +12,13 @@ const cors = require('cors');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors('https://5000-teal-fox-mayilo51.ws-us13.gitpod.io'))
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  })
+);
+
 
 
 const mongoose = require('mongoose')
@@ -64,8 +70,6 @@ app.post('/api/users/login', (req, res) =>{
         res.cookie("x_auth", user.token)
         .status(200)
         .json({ loginSuccess : true, userId : user._id})
-
-        console.log('user.token : ', user.token)
       })
     })
   })
@@ -90,6 +94,7 @@ app.get('/api/users/logout', auth, (req, res) => {
     if (err) return res.json({success : false, err});
     return res.status(200).send({success : true})
   })
+  console.log('token : ', req.token)
 })
 
 

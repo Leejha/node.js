@@ -1,15 +1,20 @@
 import React,{useEffect} from 'react'
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+
+const apiUrl = 'https://5000-teal-fox-mayilo51.ws-us13.gitpod.io';
 
 
 function LandingPage(props) {
     useEffect(() => {
-        axios.get('/api/hello')
+        const reqUrl = apiUrl + '/api/hello'
+        axios.get(reqUrl)
         .then(response => { console.log(response)})
     }, [])
 
     const onClickHandler = () =>{
-        axios.get('/api/users/logout')
+        const reqUrl = apiUrl + '/api/users/logout'
+        axios.get(reqUrl)
         .then( response => {
             if (response.data.success) {
                 props.history.push('/login')
@@ -37,4 +42,4 @@ function LandingPage(props) {
         )
 }
 
-export default LandingPage
+export default withRouter(LandingPage)
